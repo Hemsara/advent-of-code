@@ -2,7 +2,51 @@ use std::fs;
 use std::io;
 
 pub fn day_four() -> io::Result<()> {
-    let contents = fs::read_to_string("input_four.txt")?;
+    v2();
+    Ok(())
+}
+
+fn v2() {
+    let contents = fs::read_to_string("input_four.txt").unwrap();
+
+    let mut grid: Vec<Vec<char>> = Vec::new();
+
+    for line in contents.lines() {
+        grid.push(line.chars().collect());
+    }
+
+    let mut total_removed = 0;
+
+    loop {
+        let mut possible_indexes: Vec<(usize, usize)> = Vec::new();
+
+        for row in 0..grid.len() {
+            for col in 0..grid[row].len() {
+                check_around(&grid, row, col, &mut possible_indexes);
+            }
+        }
+
+        if possible_indexes.is_empty() {
+            break; // no more accessible rolls
+        }
+
+        for (row, col) in &possible_indexes {
+            grid[*row][*col] = '.';
+        }
+
+        total_removed += possible_indexes.len();
+    }
+
+    println!("Total rolls removed: {}", total_removed);
+
+    for row in grid.iter() {
+        let line: String = row.iter().collect();
+        println!("{}", line);
+    }
+}
+
+fn v1() {
+    let contents = fs::read_to_string("input_four.txt").unwrap();
 
     let mut grid: Vec<Vec<char>> = Vec::new();
     let mut possible_indexes: Vec<(usize, usize)> = Vec::new();
@@ -19,8 +63,6 @@ pub fn day_four() -> io::Result<()> {
 
     let total_accessible = possible_indexes.len();
     println!("Total accessible rolls: {}", total_accessible);
-
-    Ok(())
 }
 
 fn check_around(
